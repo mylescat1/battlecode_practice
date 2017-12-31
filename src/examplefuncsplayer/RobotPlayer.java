@@ -37,6 +37,7 @@ public strictfp class RobotPlayer {
         System.out.println("I'm an archon!");
         Team enemy = rc.getTeam().opponent();
         MapLocation[] enArchonLoc = rc.getInitialArchonLocations(enemy);
+        System.out.println(enArchonLoc[0]);
         
         // The code you want your robot to perform every round should be in this loop
         while (true) {
@@ -299,7 +300,7 @@ public strictfp class RobotPlayer {
     	Direction newDirSub = dirToNewLoc;									//Used to subtract from dirToNewLoc
     	Direction newDir = dirToNewLoc;										//Used to update depending on NewDirAdd/Sub
     	Direction toMove = null;											//Direction to move
-    	float distanceToNewLoc = currentLoc.distanceTo(desiredLocation);	//find euclidean distance to desired location
+    	//float distanceToNewLoc = currentLoc.distanceTo(desiredLocation);	//find euclidean distance to desired location
     	int obsCount = 0;													//obstructs array count
     	boolean robotInRadius = true; 										//boolean to determine if nearbyRobots is empty
     	boolean treeInRadius = true; 										//boolean to determine if nearbyTrees is empty
