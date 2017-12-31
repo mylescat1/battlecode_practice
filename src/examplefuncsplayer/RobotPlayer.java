@@ -275,4 +275,81 @@ public strictfp class RobotPlayer {
 
         return (perpendicularDist <= rc.getType().bodyRadius);
     }
+    
+    
+    /**
+     * A slightly more complicated example function, this returns true if the given bullet is on a collision
+     * course with the current robot. Doesn't take into account objects between the bullet and this robot.
+     *
+     * @param bullet The bullet in question
+     * @return True if the line of the bullet's path intersects with this robot's current position.
+     */    
+    static void shortestPath(MapLocation desiredLocation) {
+    	MapLocation currentLoc = rc.getLocation();							//declare current location
+    	float distanceToNewLoc = currentLoc.distanceTo(desiredLocation);	//find euclidean distance to desired location
+    	Direction dirToNewLoc = currentLoc.directionTo(desiredLocation);	//find direction to desired location
+    	MapLocation obstructs[] = new MapLocation[100];						//Map location of objects that obstruct direct path to desired location
+    	int obsCount = 0;													//obstructs array count
+    	Direction newDirAdd = dirToNewLoc;									//Used to add from dirToNewLoc
+    	Direction newDirSub = dirToNewLoc;									//Used to subtract from dirToNewLoc
+    	Direction newDir = dirToNewLoc;										//Used to update depending on NewDirAdd/Sub
+    	
+    	//Sense for robots, trees, bullets to see if anything will obstruct path at max sensor radius
+    	//identify objects that lie in desired direction
+    	RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
+    	TreeInfo[] nearbyTrees = rc.senseNearbyTrees();
+    	BulletInfo[] nearbyBullets = rc.senseNearbyBullets();
+    	
+    	//if something sensed, add radians + direction to array
+    	for (RobotInfo robot : nearbyRobots) {
+    		MapLocation robLoc = robot.getLocation();    				//get robot location
+    		Direction dirToRobLoc = currentLoc.directionTo(robLoc);		//get direction to robot location
+    		boolean objectFound;								//boolean to identify objects already in obstructs array
+    		
+    		//iterate through directions to find if dirToRobLoc is in the obstructs array
+    		for (MapLocation object : obstructs)
+    		{
+    			if(robLoc.equals(object))
+    			{
+    				objectFound = true;
+    			}
+    		}//end for
+    		
+    		
+    		//if robot location is in the direction of desired location, add to obstructs array
+    		if(dirToRobLoc.equals(newDir) && !objectFound)
+    		{
+    			//add robLoc to obstructs array
+    			obstructs[obsCount] = robLoc;
+
+    			if(obsCount % 2 == 0) {
+    				newDirAdd.rotateRightRads(1);		//rotate right 1x radian to avoid object
+    				newDir = newDirAdd;
+    			} else {
+    				newDirSub.rotateLeftRads(1);		//rotate left 1x radian to avoid object
+    				newDir = newDirSub;
+    			}
+    			
+    			//add to count of array	
+    			obsCount++;						
+    		} else {
+    	    	//Simplest move first: if rc can move in the direction of desired location, rc moves. 
+    	    	if (rc.canMove(newDir)) {
+    	    		try {
+    					rc.move(newDir);
+    				} catch (GameActionException e) {
+    					// TODO Auto-generated catch block
+    					System.out.println(e.getType());		//(should) print GameActionExceptionType, i.e. "CANT_DO_THAT"
+    					e.printStackTrace();
+    				}
+    		}
+    		
+    	}//end for
+    	
+    	
+
+    	//rc cannot move in the direction of the desired location
+    	
+    	
+    
 }
