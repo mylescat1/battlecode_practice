@@ -350,6 +350,6 @@ public strictfp class RobotPlayer {
 
     	//rc cannot move in the direction of the desired location
     	
-    	
-    
+    	} 	
+    }
 }
