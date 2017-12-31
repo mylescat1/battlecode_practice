@@ -35,7 +35,9 @@ public strictfp class RobotPlayer {
 
     static void runArchon() throws GameActionException {
         System.out.println("I'm an archon!");
-
+        Team enemy = rc.getTeam().opponent();
+        MapLocation[] enArchonLoc = rc.getInitialArchonLocations(enemy);
+        
         // The code you want your robot to perform every round should be in this loop
         while (true) {
 
@@ -51,8 +53,11 @@ public strictfp class RobotPlayer {
                 }
 
                 // Move randomly
-                tryMove(randomDirection());
-
+                //tryMove(randomDirection());
+                shortestPath(enArchonLoc[0]);
+                System.out.println("just did shortest path!");
+                
+                
                 // Broadcast archon's location for other robots on the team to know
                 MapLocation myLocation = rc.getLocation();
                 rc.broadcast(0,(int)myLocation.x);
@@ -94,7 +99,7 @@ public strictfp class RobotPlayer {
 
                 // Move randomly
                 tryMove(randomDirection());
-
+                
                 // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
                 Clock.yield();
 
@@ -108,6 +113,7 @@ public strictfp class RobotPlayer {
     static void runSoldier() throws GameActionException {
         System.out.println("I'm an soldier!");
         Team enemy = rc.getTeam().opponent();
+        MapLocation[] enArchonLoc = rc.getInitialArchonLocations(enemy);
 
         // The code you want your robot to perform every round should be in this loop
         while (true) {
@@ -129,7 +135,9 @@ public strictfp class RobotPlayer {
                 }
 
                 // Move randomly
-                tryMove(randomDirection());
+                //tryMove(randomDirection());
+                shortestPath(enArchonLoc[0]);
+                System.out.println("SOLDIER: just did shortest path!");
 
                 // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
                 Clock.yield();
@@ -278,11 +286,10 @@ public strictfp class RobotPlayer {
     
     
     /**
-     * A slightly more complicated example function, this returns true if the given bullet is on a collision
-     * course with the current robot. Doesn't take into account objects between the bullet and this robot.
+     * The function finds the shortest (straight line) path to desired endpoint, then assesses all objects in straight line path and 
+     * adjusts to the left or right of the direct path until it finds an opening. Once found, object moves. 
      *
-     * @param bullet The bullet in question
-     * @return True if the line of the bullet's path intersects with this robot's current position.
+     * @param the end location
      */    
     static void shortestPath(MapLocation desiredLocation) {
     	MapLocation currentLoc = rc.getLocation();							//declare current location
@@ -291,107 +298,132 @@ public strictfp class RobotPlayer {
     	Direction newDirAdd = dirToNewLoc;									//Used to add from dirToNewLoc
     	Direction newDirSub = dirToNewLoc;									//Used to subtract from dirToNewLoc
     	Direction newDir = dirToNewLoc;										//Used to update depending on NewDirAdd/Sub
-    	Direction toMove = dirToNewLoc;										//Direction to move
+    	Direction toMove = null;											//Direction to move
     	float distanceToNewLoc = currentLoc.distanceTo(desiredLocation);	//find euclidean distance to desired location
     	int obsCount = 0;													//obstructs array count
+    	boolean robotInRadius = true; 										//boolean to determine if nearbyRobots is empty
+    	boolean treeInRadius = true; 										//boolean to determine if nearbyTrees is empty
 
     	
     	//Sense for robots, trees, bullets to see if anything will obstruct path at max sensor radius
     	//identify objects that lie in desired direction
     	RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
-    	TreeInfo[] nearbyTrees = rc.senseNearbyTrees();
-    	//BulletInfo[] nearbyBullets = rc.senseNearbyBullets();		//Like bullets on the attack, or bullets to pick up for points?
-    	
-    	
+    	TreeInfo[] nearbyTrees = rc.senseNearbyTrees();    	
+
     	//-----------------------------ROBOTS----------------------------------------------//
-    	if (nearbyRobots > 0) {
+    	//do while robots are in the area (robotInRadius), run this for-loop, otherwise bypass it
+    	do {
+    		
 	    	//if something sensed, add radians + direction to array
 	    	for (RobotInfo robot : nearbyRobots) {
-	    		MapLocation robLoc = robot.getLocation();    				//get robot location
-	    		Direction dirToRobLoc = currentLoc.directionTo(robLoc);		//get direction to robot location
-	    		boolean objectFound;								//boolean to identify objects already in obstructs array
 	    		
-	    		//iterate through directions to find if dirToRobLoc is in the obstructs array
-	    		for (MapLocation object : obstructs)
-	    		{
-	    			if(robLoc.equals(object))
-	    			{
-	    				objectFound = true;							//FIX: Consider using the RobotID 
-	    			}
-	    		}//end for
-
-	    		//if robot location is in the direction of desired location, add to obstructs array
-	    		if(dirToRobLoc.equals(newDir) && !objectFound)
-	    		{
-	    			//add robLoc to obstructs array
-	    			obstructs[obsCount] = robLoc;
+	    		//if robot is null - the array is null and no robots have been sensed in the object's senseRadius area.  
+	    		if (robot != null) {
+		    		MapLocation robLoc = robot.getLocation();    				//get robot location
+		    		Direction dirToRobLoc = currentLoc.directionTo(robLoc);		//get direction to robot location
+		    		boolean objectFound = false;								//boolean to identify objects already in obstructs array
+		    		
+		    		//iterate through directions to find if dirToRobLoc is in the obstructs array
+		    		for (MapLocation object : obstructs)
+		    		{
+		    			if(robLoc.equals(object))
+		    			{
+		    				objectFound = true;							//FIX: Consider using the RobotID instead of robLoc
+		    			}
+		    		}//end for
 	
-	    			if(obsCount % 2 == 0) {
-	    				newDirAdd.rotateRightRads(1);		//rotate right 1x radian to avoid object
-	    				newDir = newDirAdd;					//set newDir with new radian for next loop
-	    			} else {
-	    				newDirSub.rotateLeftRads(1);		//rotate left 1x radian to avoid object
-	    				newDir = newDirSub;					//set newDir with new radian for next loop
-	    			}
-	    			
-	    			//add to count of array	
-	    			obsCount++;						
-	    		} else if (!objectFound) {
-	    	    	toMove = newDir;
-	    		}//end else
+		    		//if robot location is in the direction of desired location, add to obstructs array
+		    		if(dirToRobLoc.equals(newDir) && objectFound == false)
+		    		{
+		    			//add robLoc to obstructs array
+		    			obstructs[obsCount] = robLoc;
+		
+		    			if(obsCount % 2 == 0) {
+		    				newDirAdd.rotateRightRads(1);		//rotate right 1x radian to avoid object
+		    				newDir = newDirAdd;					//set newDir with new radian for next loop
+		    			} else {
+		    				newDirSub.rotateLeftRads(1);		//rotate left 1x radian to avoid object
+		    				newDir = newDirSub;					//set newDir with new radian for next loop
+		    			}
+		    			
+		    			//add to count of array	
+		    			obsCount++;						
+		    		} else if (objectFound == false) {
+		    	    	toMove = newDir;
+		    		}//end else
+	    		}//end if (robot != null)
+	    		
+	    		else {
+	    			robotInRadius = false;
+	    			toMove = newDir;
+	    		}//end else if (robot != null)
 	    	}//end for
-    	}//end if
+    	} while (robotInRadius);
 
+    	
     	//-----------------------------TREES----------------------------------------------//
-    	if (nearbyTrees > 0) {
+    	//do while trees are in the area (treeInRadius), run this for-loop, otherwise bypass it
+    	do {
+
 	    	//if something sensed, add radians + direction to array
 	    	for (TreeInfo tree : nearbyTrees) {
-	    		MapLocation treeLoc = tree.getLocation();    					//get robot location
-	    		Direction dirToTreeLoc = currentLoc.directionTo(treeLoc);		//get direction to robot location
-	    		boolean treeFound;												//boolean to identify objects already in obstructs array
-	    		
-	    		//iterate through directions to find if dirToRobLoc is in the obstructs array
-	    		for (MapLocation object : obstructs)
-	    		{
-	    			if(treeLoc.equals(object))
-	    			{
-	    				treeFound = true;
-	    			}
-	    		}//end for
-
-	    		//if robot location is in the direction of desired location, add to obstructs array
-	    		if(dirToTreeLoc.equals(newDir) && !treeFound)
-	    		{
-	    			//add robLoc to obstructs array
-	    			obstructs[obsCount] = treeLoc;
+	    		//if robot is null - the array is null and no robots have been sensed in the object's senseRadius area.  
+	    		if (tree != null) {
+		    		MapLocation treeLoc = tree.getLocation();    					//get robot location
+		    		Direction dirToTreeLoc = currentLoc.directionTo(treeLoc);		//get direction to robot location
+		    		boolean treeFound = false;										//boolean to identify objects already in obstructs array
+		    		
+		    		//iterate through directions to find if dirToRobLoc is in the obstructs array
+		    		for (MapLocation object : obstructs)
+		    		{
+		    			if(treeLoc.equals(object))
+		    			{
+		    				treeFound = true;
+		    			}
+		    		}//end for
 	
-	    			if(obsCount % 2 == 0) {
-	    				newDirAdd.rotateRightRads(1);		//rotate right 1x radian to avoid object
-	    				newDir = newDirAdd;
-	    			} else {
-	    				newDirSub.rotateLeftRads(1);		//rotate left 1x radian to avoid object
-	    				newDir = newDirSub;
-	    			}
-	    			
-	    			//add to count of array	
-	    			obsCount++;						
-	    		} else if (!treeFound){
-	    	    	toMove = newDir;
-	    		}//end else
+		    		//if robot location is in the direction of desired location, add to obstructs array
+		    		if(dirToTreeLoc.equals(newDir) && treeFound == false)
+		    		{
+		    			//add robLoc to obstructs array
+		    			obstructs[obsCount] = treeLoc;
+		
+		    			if(obsCount % 2 == 0) {
+		    				newDirAdd.rotateRightRads(1);		//rotate right 1x radian to avoid object
+		    				newDir = newDirAdd;
+		    			} else {
+		    				newDirSub.rotateLeftRads(1);		//rotate left 1x radian to avoid object
+		    				newDir = newDirSub;
+		    			}
+		    			
+		    			//add to count of array	
+		    			obsCount++;						
+		    		} else if (treeFound == false){
+		    	    	toMove = newDir;
+		    		}//end else
+	    		}//end if (tree != null)
+	    		
+		    	else {
+		    		treeInRadius = false;
+		    		toMove = newDir;
+		    	}//end else if (robot != null)
 	    	}//end for
-    	}//end if
+	    } while (treeInRadius);
     	
     	//-----------------------------MOVE----------------------------------------------//
-    	if (rc.canMove(newDir)) {
+    	if (rc.canMove(toMove) && toMove != null) {
     		try {
-				rc.move(newDir);
+    			System.out.println("On the move!");
+				rc.move(toMove);
 			} catch (GameActionException e) {
 				// TODO Auto-generated catch block
 				System.out.println(e.getType());		//(should) print GameActionExceptionType, i.e. "CANT_DO_THAT"
 				e.printStackTrace();
 			}
-    	}//end if
+    	}//end if	
     	
-    	} 	
-    }
-}
+    	//delete allocated memory of array
+    	obstructs = null;
+    }//end function 	
+
+}//end class
