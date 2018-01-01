@@ -305,19 +305,21 @@ public strictfp class RobotPlayer {
     	boolean robotInRadius = true; 										//boolean to determine if nearbyRobots is empty
     	boolean treeInRadius = true; 										//boolean to determine if nearbyTrees is empty
 
-    	
+    	System.out.println("Made it to shortestPath function");				//DEBUG STATEMENT
     	//Sense for robots, trees, bullets to see if anything will obstruct path at max sensor radius
     	//identify objects that lie in desired direction
     	RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
     	TreeInfo[] nearbyTrees = rc.senseNearbyTrees();    	
-
+    	System.out.println("Sensed for robots and trees.");					//DEBUG STATEMENT
+    	
+    	
     	//-----------------------------ROBOTS----------------------------------------------//
     	//do while robots are in the area (robotInRadius), run this for-loop, otherwise bypass it
-    	do {
-    		
+    	//do {
+    		//System.out.println("entered robots do-while");					//DEBUG STATEMENT
 	    	//if something sensed, add radians + direction to array
 	    	for (RobotInfo robot : nearbyRobots) {
-	    		
+	    		System.out.println("entered robots for-loop");					//DEBUG STATEMENT
 	    		//if robot is null - the array is null and no robots have been sensed in the object's senseRadius area.  
 	    		if (robot != null) {
 		    		MapLocation robLoc = robot.getLocation();    				//get robot location
@@ -330,11 +332,12 @@ public strictfp class RobotPlayer {
 		    			if(robLoc.equals(object))
 		    			{
 		    				objectFound = true;							//FIX: Consider using the RobotID instead of robLoc
+		    				robotInRadius = false;
 		    			}
 		    		}//end for
 	
 		    		//if robot location is in the direction of desired location, add to obstructs array
-		    		if(dirToRobLoc.equals(newDir) && objectFound == false)
+		    		if(dirToRobLoc.equals(newDir) && objectFound == false && robotInRadius)
 		    		{
 		    			//add robLoc to obstructs array
 		    			obstructs[obsCount] = robLoc;
@@ -349,7 +352,7 @@ public strictfp class RobotPlayer {
 		    			
 		    			//add to count of array	
 		    			obsCount++;						
-		    		} else if (objectFound == false) {
+		    		} else if (objectFound == false && robotInRadius) {
 		    	    	toMove = newDir;
 		    		}//end else
 	    		}//end if (robot != null)
@@ -358,17 +361,20 @@ public strictfp class RobotPlayer {
 	    			robotInRadius = false;
 	    			toMove = newDir;
 	    		}//end else if (robot != null)
+	    		System.out.println("Exiting robots for-loop");			//DEBUG STATEMENT
 	    	}//end for
-    	} while (robotInRadius);
+    //	} while (robotInRadius);
 
     	
     	//-----------------------------TREES----------------------------------------------//
     	//do while trees are in the area (treeInRadius), run this for-loop, otherwise bypass it
-    	do {
-
+    	//do {
+    		//System.out.println("Entering trees do-while statement");		//DEBUG STATEMENT
 	    	//if something sensed, add radians + direction to array
 	    	for (TreeInfo tree : nearbyTrees) {
 	    		//if robot is null - the array is null and no robots have been sensed in the object's senseRadius area.  
+	    		System.out.println("entered trees for-loop");					//DEBUG STATEMENT
+
 	    		if (tree != null) {
 		    		MapLocation treeLoc = tree.getLocation();    					//get robot location
 		    		Direction dirToTreeLoc = currentLoc.directionTo(treeLoc);		//get direction to robot location
@@ -380,6 +386,7 @@ public strictfp class RobotPlayer {
 		    			if(treeLoc.equals(object))
 		    			{
 		    				treeFound = true;
+		    				treeInRadius = false;
 		    			}
 		    		}//end for
 	
@@ -408,14 +415,17 @@ public strictfp class RobotPlayer {
 		    		treeInRadius = false;
 		    		toMove = newDir;
 		    	}//end else if (robot != null)
+	    		System.out.println("Exiting trees for-loop");			//DEBUG STATEMENT
 	    	}//end for
-	    } while (treeInRadius);
+	    //} while (treeInRadius);
     	
     	//-----------------------------MOVE----------------------------------------------//
     	if (rc.canMove(toMove) && toMove != null) {
+    		System.out.println("Entering move if statement");			//DEBUG STATEMENT
     		try {
     			System.out.println("On the move!");
 				rc.move(toMove);
+	    		System.out.println("MOVING!");			//DEBUG STATEMENT
 			} catch (GameActionException e) {
 				// TODO Auto-generated catch block
 				System.out.println(e.getType());		//(should) print GameActionExceptionType, i.e. "CANT_DO_THAT"
