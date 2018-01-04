@@ -291,150 +291,162 @@ public strictfp class RobotPlayer {
      * adjusts to the left or right of the direct path until it finds an opening. Once found, object moves. 
      *
      * @param the end location
+     * @throws GameActionException 
      */    
-    static void shortestPath(MapLocation desiredLocation) {
+    static void shortestPath(MapLocation desiredLocation) throws GameActionException {
     	MapLocation currentLoc = rc.getLocation();							//declare current location
-    	MapLocation obstructs[] = new MapLocation[100];						//Map location of objects that obstruct direct path to desired location
+    	Direction dirObstructs[] = new Direction[25];						//Map location of objects that obstruct direct path to desired location
     	Direction dirToNewLoc = currentLoc.directionTo(desiredLocation);	//find direction to desired location
-    	Direction newDirAdd = dirToNewLoc;									//Used to add from dirToNewLoc
-    	Direction newDirSub = dirToNewLoc;									//Used to subtract from dirToNewLoc
     	Direction newDir = dirToNewLoc;										//Used to update depending on NewDirAdd/Sub
     	Direction toMove = null;											//Direction to move
-    	//float distanceToNewLoc = currentLoc.distanceTo(desiredLocation);	//find euclidean distance to desired location
-    	int obsCount = 0;													//obstructs array count
-    	boolean robotInRadius = true; 										//boolean to determine if nearbyRobots is empty
-    	boolean treeInRadius = true; 										//boolean to determine if nearbyTrees is empty
-
+    	int robotObsCount = 0;												//Robots obstructs array count
+    	int treeObsCount = 0;												//Tree obstructs array count
+    	int dirObsCount = 0;												//Tree obstructs array count
+        int rad = 1;														//Sets initial radians variable for newDirAdd and new DirSub
+    	
     	System.out.println("Made it to shortestPath function");				//DEBUG STATEMENT
+    	
     	//Sense for robots, trees, bullets to see if anything will obstruct path at max sensor radius
     	//identify objects that lie in desired direction
     	RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
     	TreeInfo[] nearbyTrees = rc.senseNearbyTrees();    	
+    	
     	System.out.println("Sensed for robots and trees.");					//DEBUG STATEMENT
     	
-    	
+
     	//-----------------------------ROBOTS----------------------------------------------//
-    	//do while robots are in the area (robotInRadius), run this for-loop, otherwise bypass it
-    	//do {
-    		//System.out.println("entered robots do-while");					//DEBUG STATEMENT
 	    	//if something sensed, add radians + direction to array
 	    	for (RobotInfo robot : nearbyRobots) {
 	    		System.out.println("entered robots for-loop");					//DEBUG STATEMENT
+	    		
 	    		//if robot is null - the array is null and no robots have been sensed in the object's senseRadius area.  
 	    		if (robot != null) {
 		    		MapLocation robLoc = robot.getLocation();    				//get robot location
 		    		Direction dirToRobLoc = currentLoc.directionTo(robLoc);		//get direction to robot location
-		    		boolean objectFound = false;								//boolean to identify objects already in obstructs array
 		    		
-		    		//iterate through directions to find if dirToRobLoc is in the obstructs array
-		    		for (MapLocation object : obstructs)
-		    		{
-		    			if(robLoc.equals(object))
-		    			{
-		    				objectFound = true;							//FIX: Consider using the RobotID instead of robLoc
-		    				robotInRadius = false;
-		    			}
-		    		}//end for
-	
-		    		//if robot location is in the direction of desired location, add to obstructs array
-		    		if(dirToRobLoc.equals(newDir) && objectFound == false && robotInRadius)
-		    		{
-		    			//add robLoc to obstructs array
-		    			obstructs[obsCount] = robLoc;
+	    			System.out.println("Robots sensed in radius: " + robot.getID());			//DEBUG STATEMENT
+	    			
+	    			//add dirToRobLoc to dirObstructs array
+	    			 dirObstructs[dirObsCount] = dirToRobLoc;
+	    			 dirObsCount++;
 		
-		    			if(obsCount % 2 == 0) {
-		    				newDirAdd.rotateRightRads(1);		//rotate right 1x radian to avoid object
-		    				newDir = newDirAdd;					//set newDir with new radian for next loop
+
+		    		//if robot location is in the direction of desired location, rotate # of radians
+		    		if(dirToRobLoc.equals(newDir, 1))
+		    		{
+		    			if(robotObsCount % 2 == 0) {
+		    				newDir = newDir.rotateRightRads(rad);		//rotate right # of rad to avoid object
+			    			if (rad < 6) {
+			    				rad +=1;
+				    			System.out.println("ROBOTS FOUND: Rotating Right: " + rad);			//DEBUG STATEMENT
+			    			} else {
+			    				rad = 1;
+			    			}
 		    			} else {
-		    				newDirSub.rotateLeftRads(1);		//rotate left 1x radian to avoid object
-		    				newDir = newDirSub;					//set newDir with new radian for next loop
+		    				newDir = newDir.rotateLeftRads(rad);		//rotate left # of rad to avoid object
+			    			if (rad < 6) {
+			    				rad +=1;
+				    			System.out.println("ROBOTS FOUND: Rotating Left: " + rad);			//DEBUG STATEMENT
+			    			} else {
+			    				rad = 1;
+			    			}
 		    			}
-		    			
-		    			//add to count of array	
-		    			obsCount++;						
-		    		} else if (objectFound == false && robotInRadius) {
+		    		} else {
 		    	    	toMove = newDir;
+		    			System.out.println("No robots found in direction of movement, updated toMove.");			//DEBUG STATEMENT
 		    		}//end else
+	    			robotObsCount++;					//add to count of array		
+	    			System.out.println("RobotsCount updated.");
 	    		}//end if (robot != null)
 	    		
 	    		else {
-	    			robotInRadius = false;
 	    			toMove = newDir;
+	    			System.out.println("ROBOTS IS NULL");			//DEBUG STATEMENT
 	    		}//end else if (robot != null)
 	    		System.out.println("Exiting robots for-loop");			//DEBUG STATEMENT
 	    	}//end for
-    //	} while (robotInRadius);
 
     	
     	//-----------------------------TREES----------------------------------------------//
-    	//do while trees are in the area (treeInRadius), run this for-loop, otherwise bypass it
-    	//do {
-    		//System.out.println("Entering trees do-while statement");		//DEBUG STATEMENT
 	    	//if something sensed, add radians + direction to array
 	    	for (TreeInfo tree : nearbyTrees) {
 	    		//if robot is null - the array is null and no robots have been sensed in the object's senseRadius area.  
-	    		System.out.println("entered trees for-loop");					//DEBUG STATEMENT
+	    		System.out.println("Entered trees for-loop");					//DEBUG STATEMENT
 
 	    		if (tree != null) {
 		    		MapLocation treeLoc = tree.getLocation();    					//get robot location
 		    		Direction dirToTreeLoc = currentLoc.directionTo(treeLoc);		//get direction to robot location
-		    		boolean treeFound = false;										//boolean to identify objects already in obstructs array
+		    		boolean robotFound = false;										//boolean to identify objects that 
+		    																		//have been identified as robots
 		    		
-		    		//iterate through directions to find if dirToRobLoc is in the obstructs array
-		    		for (MapLocation object : obstructs)
+	    			System.out.println("Trees sensed in radius: " + tree.getID());			//DEBUG STATEMENT
+
+	    			//creating null point 
+	    			for (Direction dir : dirObstructs) {
+	    				if (dir != null) {
+		    				if (dir.equals(dirToTreeLoc, 1)) {
+		    					robotFound = true;
+		    				} else {
+		    					robotFound = false;
+		    				}
+	    				}
+	    			}	
+
+		    		//if tree location (or previously identified robot) is in the direction of desired location (by error of 1 radian)
+	    			//or robot is in the same direction as dirToTreeLoc is looking
+		    		if(dirToTreeLoc.equals(newDir, 1) || robotFound == true)				
 		    		{
-		    			if(treeLoc.equals(object))
-		    			{
-		    				treeFound = true;
-		    				treeInRadius = false;
-		    			}
-		    		}//end for
-	
-		    		//if robot location is in the direction of desired location, add to obstructs array
-		    		if(dirToTreeLoc.equals(newDir) && treeFound == false)
-		    		{
-		    			//add robLoc to obstructs array
-		    			obstructs[obsCount] = treeLoc;
-		
-		    			if(obsCount % 2 == 0) {
-		    				newDirAdd.rotateRightRads(1);		//rotate right 1x radian to avoid object
-		    				newDir = newDirAdd;
+		    			if(treeObsCount % 2 == 0) {
+		    				newDir = newDir.rotateRightRads(rad);		//rotate right # of rad to avoid object
+			    			if (rad < 6) {
+			    				rad +=1;
+				    			System.out.println("TREES FOUND: Rotating Right: " + rad);			//DEBUG STATEMENT
+			    			} else {
+			    				rad = 1;
+			    				//
+			    			}
 		    			} else {
-		    				newDirSub.rotateLeftRads(1);		//rotate left 1x radian to avoid object
-		    				newDir = newDirSub;
-		    			}
-		    			
-		    			//add to count of array	
-		    			obsCount++;						
-		    		} else if (treeFound == false){
+		    				newDir = newDir.rotateLeftRads(rad);		//rotate left # of rad to avoid object
+			    			if (rad < 6) {
+			    				rad +=1;
+				    			System.out.println("TREES FOUND: Rotating Left: " + rad);			//DEBUG STATEMENT
+			    			} else {
+			    				rad = 1;
+			    			}
+		    			}				
+		    		} else if (robotFound == false){
 		    	    	toMove = newDir;
+		    			System.out.println("No trees found, moving.");			//DEBUG STATEMENT
 		    		}//end else
+		    		treeObsCount++;						//add to count of array
 	    		}//end if (tree != null)
 	    		
 		    	else {
-		    		treeInRadius = false;
 		    		toMove = newDir;
-		    	}//end else if (robot != null)
+	    			System.out.println("TREE IS NULL");			//DEBUG STATEMENT
+		    	}//end else if (tree != null)
 	    		System.out.println("Exiting trees for-loop");			//DEBUG STATEMENT
 	    	}//end for
-	    //} while (treeInRadius);
     	
     	//-----------------------------MOVE----------------------------------------------//
-    	if (rc.canMove(toMove) && toMove != null) {
-    		System.out.println("Entering move if statement");			//DEBUG STATEMENT
+    	if (rc.canMove(toMove)) {
     		try {
-    			System.out.println("On the move!");
 				rc.move(toMove);
 	    		System.out.println("MOVING!");			//DEBUG STATEMENT
 			} catch (GameActionException e) {
 				// TODO Auto-generated catch block
-				System.out.println(e.getType());		//(should) print GameActionExceptionType, i.e. "CANT_DO_THAT"
+				//System.out.println(e.getType());		//(should) print GameActionExceptionType, i.e. "CANT_DO_THAT"
 				e.printStackTrace();
 			}
     	}//end if	
+    	else {
+    		System.out.println("Can't Move! Trying a random direction");			//DEBUG STATEMENT
+            // Try a random direction
+            tryMove(randomDirection());
+    	}
     	
     	//delete allocated memory of array
-    	obstructs = null;
+    	dirObstructs = null;
     }//end function 	
 
 }//end class
