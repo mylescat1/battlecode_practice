@@ -336,7 +336,7 @@ public strictfp class RobotPlayer {
 		    		{
 		    			if(robotObsCount % 2 == 0) {
 		    				newDir = newDir.rotateRightRads(rad);		//rotate right # of rad to avoid object
-			    			if (rad < 6) {
+			    			if (rad < 7) {
 			    				rad +=1;
 				    			System.out.println("ROBOTS FOUND: Rotating Right: " + rad);			//DEBUG STATEMENT
 			    			} else {
@@ -344,7 +344,7 @@ public strictfp class RobotPlayer {
 			    			}
 		    			} else {
 		    				newDir = newDir.rotateLeftRads(rad);		//rotate left # of rad to avoid object
-			    			if (rad < 6) {
+			    			if (rad < 7) {
 			    				rad +=1;
 				    			System.out.println("ROBOTS FOUND: Rotating Left: " + rad);			//DEBUG STATEMENT
 			    			} else {
@@ -398,16 +398,15 @@ public strictfp class RobotPlayer {
 		    		{
 		    			if(treeObsCount % 2 == 0) {
 		    				newDir = newDir.rotateRightRads(rad);		//rotate right # of rad to avoid object
-			    			if (rad < 6) {
+			    			if (rad < 7) {
 			    				rad +=1;
 				    			System.out.println("TREES FOUND: Rotating Right: " + rad);			//DEBUG STATEMENT
 			    			} else {
-			    				rad = 1;
-			    				//
+			    				rad = 6;
 			    			}
 		    			} else {
 		    				newDir = newDir.rotateLeftRads(rad);		//rotate left # of rad to avoid object
-			    			if (rad < 6) {
+			    			if (rad < 7) {
 			    				rad +=1;
 				    			System.out.println("TREES FOUND: Rotating Left: " + rad);			//DEBUG STATEMENT
 			    			} else {
