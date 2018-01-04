@@ -402,7 +402,7 @@ public strictfp class RobotPlayer {
 			    				rad +=1;
 				    			System.out.println("TREES FOUND: Rotating Right: " + rad);			//DEBUG STATEMENT
 			    			} else {
-			    				rad = 6;
+			    				rad = 1;
 			    			}
 		    			} else {
 		    				newDir = newDir.rotateLeftRads(rad);		//rotate left # of rad to avoid object
