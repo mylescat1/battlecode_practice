@@ -40,7 +40,6 @@ public class Pathfinder {
 		for(int i = 0; i < frontier.size(); i++) {
 			System.out.println(i);
 			MapLocation nextNode  = frontier.get(i);
-			System.out.println(one.toString());
 			if(!visited.contains(nextNode) && (nextNode.distanceTo(one) < (stride * 3))) {
 				buildFrontier(nextNode);
 				visited.add(nextNode);
@@ -51,11 +50,11 @@ public class Pathfinder {
 	
 	private void buildFrontier(MapLocation node) {
 		for (float direction : directions) {
-			MapLocation nextNode = node.add(direction, stride);
-			if (!frontier.contains(nextNode)) {
-				frontier.add(nextNode);
+			MapLocation newNode = node.add(direction, stride);
+			if (!frontier.contains(newNode)) {
+				frontier.add(newNode);
 				System.out.println("added");
-				rc.setIndicatorDot(nextNode, 100, 0, 0);
+				rc.setIndicatorDot(newNode, 100, 0, 0);
 			}
 		}		
 	}
