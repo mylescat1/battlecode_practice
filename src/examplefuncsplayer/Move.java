@@ -33,8 +33,8 @@ public class Move extends Global {
      * @throws GameActionException
      */
     static boolean tryMove(Direction dir, float degreeOffset, int checksPerSide) throws GameActionException {
-
-        // First, try intended direction
+        pathfinder.pathfind();
+    	// First, try intended direction
         if (rc.canMove(dir)) {
             rc.move(dir);
             return true;

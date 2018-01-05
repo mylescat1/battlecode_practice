@@ -11,7 +11,7 @@ public class BotArchon extends Global {
             	
             	Global.loop_common();
         		Clock.yield();
-
+        		
             } catch (Exception e) {
                 e.printStackTrace();
             }
