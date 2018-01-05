@@ -1,8 +1,9 @@
 package examplefuncsplayer;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
+import java.util.Queue;
 
 import battlecode.common.*;
 
@@ -12,11 +13,9 @@ public class Pathfinder {
 	private MapLocation one;
 	private List<MapLocation> frontier = new ArrayList<MapLocation>(); 
 	private List<MapLocation> visited = new ArrayList<MapLocation>();
-	ListIterator<MapLocation> iterFrontier = frontier.listIterator();
-	ListIterator<MapLocation> iterVisited = visited.listIterator();
 	private float stride, senseRange, frontierCount;
 	private float pi = (float)Math.PI;
-	private float[]directions = {2*pi,(7*pi)/4,(3*pi)/2,(5*pi)/4,pi,(3*pi)/4, pi/2, pi/4};
+	private float[]directions = {2*pi,(7*pi)/4,(3*pi)/2,(5*pi)/4, pi,-((7*pi)/4),-((3*pi)/2),-((5*pi)/4)};
 	
 	protected Pathfinder(RobotController rc) {
 		super();
@@ -34,27 +33,30 @@ public class Pathfinder {
 		one = rc.getLocation();
 		frontier.clear();
 		visited.clear();	
-		frontier.add(one);		
+		frontier.add(one);
 	}
 	
 	private void nodeRecursion() {
-		
-		while(iterFrontier.hasNext()){
-			MapLocation nextNode = iterFrontier.next();
-			System.out.println("I am here");
-			buildFrontier(nextNode);
-			//iterVisited.add(iterFrontier.next());
+		for(int i = 0; i < frontier.size(); i++) {
+			System.out.println(i);
+			MapLocation nextNode  = frontier.get(i);
+			System.out.println(one.toString());
+			if(!visited.contains(nextNode) && (nextNode.distanceTo(one) < (stride * 3))) {
+				buildFrontier(nextNode);
+				visited.add(nextNode);
+			}		
 		}
+	
 	}
 	
 	private void buildFrontier(MapLocation node) {
-		System.out.println("HERE NOW");
 		for (float direction : directions) {
 			MapLocation nextNode = node.add(direction, stride);
-			//if (!visited.contains(nextNode) && !frontier.contains(nextNode)) {
-				iterFrontier.add(nextNode);
+			if (!frontier.contains(nextNode)) {
+				frontier.add(nextNode);
+				System.out.println("added");
 				rc.setIndicatorDot(nextNode, 100, 0, 0);
-			//}
+			}
 		}		
 	}
 }
