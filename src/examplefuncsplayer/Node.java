@@ -13,7 +13,7 @@ public class Node extends Global {
 		this.y = y;
 	}
 
-	static Node closestNode(MapLocation mapLocation) {
+	private static Node closestNode(MapLocation mapLocation) {
 		
 		int x = round(mapLocation.x, 1 );
 		int y = round(mapLocation.y, 1 );
@@ -43,6 +43,10 @@ public class Node extends Global {
     	}
     	
     	return false;
+    }
+    
+    public static Node currentNode() {
+    	return closestNode(rc.getLocation());
     }
 
 	public int getX() {
