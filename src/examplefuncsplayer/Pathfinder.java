@@ -15,7 +15,7 @@ public class Pathfinder {
 	private List<MapLocation> visited = new ArrayList<MapLocation>();
 	private float stride, senseRange, frontierCount;
 	private float pi = (float)Math.PI;
-	private float[]directions = {2*pi,(7*pi)/4,(3*pi)/2,(5*pi)/4, pi,-((7*pi)/4),-((3*pi)/2),-((5*pi)/4)};
+	private float[]directions = {2*pi,(7*pi)/4,(3*pi)/2,(5*pi)/4, pi, 3*pi/4, pi/2, pi/4};
 	private int count;
 	
 	protected Pathfinder(RobotController rc) {
