@@ -36,9 +36,13 @@ public class Node extends Global {
     	return new MapLocation(x,y);
     }
     
+    private static Node mapLocationToNode(MapLocation mapLocation) {
+    	return closestNode(mapLocation);
+    }
+    
     public static boolean onNode(Node node) {
     	 	
-    	if(rc.getLocation().distanceTo(nodeToMapLocation(node)) < rc.getType().bodyRadius) {
+    	if(rc.getLocation().distanceTo(nodeToMapLocation(node)) < 0.1) {
     		return true;
     	}
     	
@@ -48,6 +52,14 @@ public class Node extends Global {
     public static Node currentNode() {
     	return closestNode(rc.getLocation());
     }
+    
+    public static Node getClosestNode(MapLocation mapLocation) {    	
+    	return mapLocationToNode(mapLocation);
+    }
+    
+    public static MapLocation getClosestMapLocation(Node node) {
+    	return nodeToMapLocation(node);
+    }
 
 	public int getX() {
 		return x;
@@ -55,6 +67,15 @@ public class Node extends Global {
 
 	public int getY() {
 		return y;
+	}
+	
+	public boolean equals(Node node) {
+		
+		if(this.x == node.x && this.y == node.y) {
+			return true;
+		}
+		
+		return false;
 	}
    
 }
