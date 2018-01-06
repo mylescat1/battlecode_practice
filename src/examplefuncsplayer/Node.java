@@ -21,7 +21,8 @@ public class Node extends Global {
 		return new Node(x, y);
 	}
 	
-    private static int round(float value, int numberOfDigitsAfterDecimalPoint) {
+    @SuppressWarnings("deprecation")
+	private static int round(float value, int numberOfDigitsAfterDecimalPoint) {
         BigDecimal bigDecimal = new BigDecimal(value);
         bigDecimal = bigDecimal.setScale(numberOfDigitsAfterDecimalPoint,
                 BigDecimal.ROUND_DOWN);
@@ -30,42 +31,44 @@ public class Node extends Global {
     
     private static MapLocation nodeToMapLocation(Node node) {
     	
-    	float x = (float) node.x;
-    	float y = (float) node.y;
-    	
-    	return new MapLocation(x,y);
+	    	float x = (float) node.x;
+	    	float y = (float) node.y;
+	    	
+	    	return new MapLocation(x,y);
     }
     
     private static Node mapLocationToNode(MapLocation mapLocation) {
-    	return closestNode(mapLocation);
+    		return closestNode(mapLocation);
     }
     
     public static boolean onNode(Node node) {
     	 	
-    	if(rc.getLocation().distanceTo(nodeToMapLocation(node)) < 0.1) {
-    		return true;
-    	}
-    	
-    	return false;
+	    	if(rc.getLocation().distanceTo(nodeToMapLocation(node)) < 0.1) {
+	    		return true;
+	    	}
+	    	
+	    	return false;
     }
     
     public static Node currentNode() {
-    	return closestNode(rc.getLocation());
+    		return closestNode(rc.getLocation());
     }
     
     public static Node getClosestNode(MapLocation mapLocation) {    	
-    	return mapLocationToNode(mapLocation);
+    		return mapLocationToNode(mapLocation);
     }
     
     public static MapLocation getClosestMapLocation(Node node) {
-    	return nodeToMapLocation(node);
+    		return nodeToMapLocation(node);
     }
     
-    public static Node add(int edges, float direction) {
+    public static Node add(int edges, NodeDirection direction) {
     	
-    	MapLocation mapLoc = rc.getLocation().add(direction, (float)edges);
-    	
-    	return getClosestNode(mapLoc);
+	    	float dir = direction.getRadians();
+	    float distance = direction.getEdgeLength();
+	    	MapLocation mapLoc = rc.getLocation().add(dir, distance);
+	    	
+	    	return getClosestNode(mapLoc);
     }
 
 	public int getX() {
