@@ -60,6 +60,13 @@ public class Node extends Global {
     public static MapLocation getClosestMapLocation(Node node) {
     	return nodeToMapLocation(node);
     }
+    
+    public static Node add(int edges, float direction) {
+    	
+    	MapLocation mapLoc = rc.getLocation().add(direction, (float)edges);
+    	
+    	return getClosestNode(mapLoc);
+    }
 
 	public int getX() {
 		return x;
