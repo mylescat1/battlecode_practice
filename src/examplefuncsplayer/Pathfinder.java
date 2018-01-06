@@ -16,9 +16,9 @@ public class Pathfinder {
 	private float stride, senseRange, frontierCount;
 	private float pi = (float)Math.PI;
 	private float[]directions = {2*pi,(7*pi)/4,(3*pi)/2,(5*pi)/4, pi,-((7*pi)/4),-((3*pi)/2),-((5*pi)/4)};
+	private int count;
 	
 	protected Pathfinder(RobotController rc) {
-		super();
 		this.rc = rc;
 		this.stride = rc.getType().strideRadius;
 		this.senseRange = rc.getType().sensorRadius;
@@ -30,6 +30,7 @@ public class Pathfinder {
 	}
 	
 	private void initPathFind() {
+		count = 0;
 		one = rc.getLocation();
 		frontier.clear();
 		visited.clear();	
@@ -40,12 +41,12 @@ public class Pathfinder {
 		for(int i = 0; i < frontier.size(); i++) {
 			System.out.println(i);
 			MapLocation nextNode  = frontier.get(i);
-			if(!visited.contains(nextNode) && (nextNode.distanceTo(one) < (stride * 3))) {
+			if(!visited.contains(nextNode)) {
 				buildFrontier(nextNode);
 				visited.add(nextNode);
+				count++;
 			}		
-		}
-	
+		}	
 	}
 	
 	private void buildFrontier(MapLocation node) {
@@ -56,7 +57,8 @@ public class Pathfinder {
 				System.out.println("added");
 				rc.setIndicatorDot(newNode, 100, 0, 0);
 			}
-		}		
+		}
+		Clock.yield();
 	}
 }
 

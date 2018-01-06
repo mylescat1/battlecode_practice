@@ -16,7 +16,6 @@ public class Global {
 	public static void loop_common() throws GameActionException { //code that every robot will execute every turn.
 	
 		Move.tryMove(Move.randomDirection());
-
-	}
 	
+	}
 }

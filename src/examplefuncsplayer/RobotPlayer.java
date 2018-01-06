@@ -1,7 +1,7 @@
 package examplefuncsplayer;
 import battlecode.common.*;
 
-public strictfp class RobotPlayer extends Global {
+public strictfp class RobotPlayer {
 
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
@@ -10,8 +10,7 @@ public strictfp class RobotPlayer extends Global {
     @SuppressWarnings("unused")
     public static void run(RobotController rc) throws GameActionException {
 
-        // This is the RobotController object. You use it to perform actions from this robot,
-        // and to get information on its current status.
+        // The robotcontroller for this bot is passed to Global. This allows all other classes to access it.
         Global.init(rc);
 
         // Here, we've separated the controls into a different method for each RobotType.
