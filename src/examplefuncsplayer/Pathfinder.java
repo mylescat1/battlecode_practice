@@ -54,7 +54,7 @@ public class Pathfinder {
 			MapLocation newNode = node.add(direction, stride);
 			if (!frontier.contains(newNode)) {
 				frontier.add(newNode);
-				System.out.println("added");
+				System.out.println("Frontier size is" + frontier.size());
 				rc.setIndicatorDot(newNode, 100, 0, 0);
 			}
 		}

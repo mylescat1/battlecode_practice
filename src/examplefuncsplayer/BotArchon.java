@@ -10,6 +10,7 @@ public class BotArchon extends Global {
             try { //Code to execute every round here:
             	
             	Global.loop_common();
+            	Clock.yield();
         		
             } catch (Exception e) {
                 e.printStackTrace();
