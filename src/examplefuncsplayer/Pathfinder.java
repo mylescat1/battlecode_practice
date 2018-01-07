@@ -18,7 +18,7 @@ public class Pathfinder {
 	private float[]directions = {2*pi,(7*pi)/4,(3*pi)/2,(5*pi)/4, pi, 3*pi/4, pi/2, pi/4};
 	private int count;
 	
-	protected Pathfinder(RobotController rc) {
+	/*protected Pathfinder(RobotController rc) {
 		this.rc = rc;
 		this.stride = rc.getType().strideRadius;
 		this.senseRange = rc.getType().sensorRadius;
@@ -59,7 +59,7 @@ public class Pathfinder {
 			}
 		}
 		Clock.yield();
-	}
+	}*/
 }
 
 

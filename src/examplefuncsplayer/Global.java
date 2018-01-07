@@ -10,7 +10,7 @@ public class Global {
 	public static void init (RobotController theRc) throws GameActionException {
 		
 		rc = theRc;
-		pathfinder = new Pathfinder(theRc);
+		//pathfinder = new Pathfinder(theRc);
 	}
 	
 	public static void loop_common() throws GameActionException { //code that every robot will execute every turn.

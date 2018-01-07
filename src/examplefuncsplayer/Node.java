@@ -15,10 +15,22 @@ public class Node extends Global {
 
 	private static Node closestNode(MapLocation mapLocation) {
 		
-		int x = round(mapLocation.x, 1 );
-		int y = round(mapLocation.y, 1 );
+		int x = closestInteger(mapLocation.x);
+		int y = closestInteger(mapLocation.y);
 		
 		return new Node(x, y);
+	}
+	
+	private static int closestInteger(float x) {
+		
+		int xInt = round(x,1);
+	    int c1 = xInt - (xInt % GameConstants.DEFAULT_EDGE_LENGTH);
+	    int c2 = (xInt + GameConstants.DEFAULT_EDGE_LENGTH) - (xInt % GameConstants.DEFAULT_EDGE_LENGTH);
+	    if (xInt - c1 > c2 - xInt) {
+	        return c2;
+	    } else {
+	        return c1;
+	    }
 	}
 	
     @SuppressWarnings("deprecation")
@@ -43,7 +55,7 @@ public class Node extends Global {
     
     public static boolean onNode(Node node) {
     	 	
-	    	if(rc.getLocation().distanceTo(nodeToMapLocation(node)) < 0.1) {
+	    	if(rc.getLocation().distanceTo(nodeToMapLocation(node)) < GameConstants.ON_NODE_PRECISION) {
 	    		return true;
 	    	}
 	    	
@@ -62,7 +74,7 @@ public class Node extends Global {
     		return nodeToMapLocation(node);
     }
     
-    public static Node add(int edges, NodeDirection direction) {
+    public static Node add(int edges, NodeVector direction) { //will add to current locations node of calling bot.
     	
 	    	float dir = direction.getRadians();
 	    float distance = direction.getEdgeLength();
@@ -70,6 +82,38 @@ public class Node extends Global {
 	    	
 	    	return getClosestNode(mapLoc);
     }
+    
+    public static Node add(Node node, int edges, NodeVector direction) { //will add to the location of the node specified.
+	    	float dir = direction.getRadians();
+	    float distance = direction.getEdgeLength();
+	    MapLocation nodeMapLoc = getClosestMapLocation(node);
+	    	MapLocation mapLoc = nodeMapLoc.add(dir, distance);
+	    	
+	    	return getClosestNode(mapLoc);
+    }
+    
+    public static Node[] getSurroundingNodes(Node node) { // Gets the surrounding nodes of a specified node.
+    		
+    		Node[] surroundingNodes = new Node[8];
+    		int i = 0;
+    		for(NodeVector vector : GameConstants.ALL_VECTORS) {
+    			surroundingNodes[i] = Node.add(node, GameConstants.DEFAULT_EDGE_LENGTH, vector);
+    			i++;
+    		}
+    		return surroundingNodes;
+    }
+    
+    public static Node[] getSurroundingNodes() { // Gets the surrounding nodes of your current node.
+		
+    		Node currentNode = Node.currentNode();
+		Node[] surroundingNodes = new Node[8];
+		int i = 0;
+		for(NodeVector vector : GameConstants.ALL_VECTORS) {
+			surroundingNodes[i] = Node.add(currentNode, GameConstants.DEFAULT_EDGE_LENGTH, vector);
+			i++;
+		}
+		return surroundingNodes;
+}
 
 	public int getX() {
 		return x;
