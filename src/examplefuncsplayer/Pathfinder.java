@@ -18,48 +18,25 @@ public class Pathfinder {
 	private float[]directions = {2*pi,(7*pi)/4,(3*pi)/2,(5*pi)/4, pi, 3*pi/4, pi/2, pi/4};
 	private int count;
 	
-	/*protected Pathfinder(RobotController rc) {
+	protected Pathfinder(RobotController rc) {
 		this.rc = rc;
 		this.stride = rc.getType().strideRadius;
 		this.senseRange = rc.getType().sensorRadius;
 	}
-
-	protected void pathfind() throws GameActionException {		
-		initPathFind();
-		nodeRecursion();
-	}
 	
-	private void initPathFind() {
-		count = 0;
-		one = Node.currentNode();
-		frontier.clear();
-		visited.clear();	
-		frontier.add(one);
-	}
-	
-	private void nodeRecursion() {
-		for(int i = 0; i < frontier.size(); i++) {
-			System.out.println(i);
-			Node nextNode  = frontier.get(i);
-			if(!visited.contains(nextNode)) {
-				buildFrontier(nextNode);
-				visited.add(nextNode);
-				count++;
-			}		
-		}	
-	}
-	
-	private void buildFrontier(Node node) {
-		for (float direction : directions) {
-			MapLocation newNode = node.add(direction, stride);
-			if (!frontier.contains(newNode)) {
-				frontier.add(newNode);
-				System.out.println("Frontier size is" + frontier.size());
-				rc.setIndicatorDot(newNode, 100, 0, 0);
+	protected void initPathfind() throws GameActionException {
+		
+		if(!Node.onNode()) {
+			System.out.println("Not on a node!");
+			Move.move(Node.getClosestNode());
+		}
+		else {
+			for(Node node : Node.getSurroundingNodes() ) {
+				System.out.println(Clock.getBytecodesLeft());
+				System.out.println(node.getX() + ", " + node.getY());
 			}
 		}
-		Clock.yield();
-	}*/
+	}
 }
 
 
