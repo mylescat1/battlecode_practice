@@ -1,7 +1,5 @@
 package examplefuncsplayer;
 
-import battlecode.common.Direction;
-
 public strictfp enum NodeVector {
 	
 	N ( (float) Math.PI/2, BotConstants.CARDINAL ),
@@ -15,14 +13,10 @@ public strictfp enum NodeVector {
 	
 	private float direction;
 	private float edgeLength;
-	
+
 	private NodeVector(float direction, float edgeLength) {
 		this.direction = direction;
 		this.edgeLength = edgeLength;
-	}
-	
-	private static boolean isBetween(float x, float lower, float upper) {
-		return lower <= x && x < upper;
 	}
 	
 	public float getRadians() {
@@ -32,13 +26,7 @@ public strictfp enum NodeVector {
 	public float getEdgeLength() {
 		return this.edgeLength;
 	}
-	
-	public NodeVector getClosestVector(Direction direction) {
-		
-		direction.
-		
-	}
-	
 
 	
+    
 }

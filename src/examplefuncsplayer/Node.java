@@ -99,11 +99,20 @@ public class Node extends Global {
 		return nodeToMapLocation(node);
     }
     
+	public static Node add(NodeVector direction) {
+    	float dir = direction.getRadians();
+    	float distance = direction.getEdgeLength();
+    	System.out.println(distance + "d");
+    	MapLocation mapLoc = rc.getLocation().add(dir, distance);
+    	
+    	return getClosestNode(mapLoc);
+	}
+	
     public static Node add(int edges, NodeVector direction) { //will add to current locations node of calling bot.
     	
     	float dir = direction.getRadians();
     	float distance = direction.getEdgeLength();
-    	MapLocation mapLoc = rc.getLocation().add(dir, distance);
+    	MapLocation mapLoc = rc.getLocation().add(dir, distance*edges);
     	
     	return getClosestNode(mapLoc);
     }
@@ -113,7 +122,7 @@ public class Node extends Global {
     	float dir = direction.getRadians();
     	float distance = direction.getEdgeLength();
     	MapLocation nodeMapLoc = getClosestMapLocation(node);
-    	MapLocation mapLoc = nodeMapLoc.add(dir, distance);
+    	MapLocation mapLoc = nodeMapLoc.add(dir, distance*edges);
     	
     	return getClosestNode(mapLoc);
     }

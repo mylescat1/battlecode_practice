@@ -15,6 +15,10 @@ public class Global {
 	
 	public static void loop_common() throws GameActionException { //code that every robot will execute every turn.
 		
+		MapLocation enemy = rc.getInitialArchonLocations(rc.getTeam().opponent())[0];
+		System.out.println(enemy.x + ", " + enemy.y);
+		Move.moveByNodes(enemy);
+		
 		//pathfinder.initPathfind();
 		
 	}
