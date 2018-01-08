@@ -1,8 +1,10 @@
 package examplefuncsplayer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import battlecode.common.*;
@@ -14,6 +16,7 @@ public class Pathfinder {
 	private List<Node> frontier = new ArrayList<Node>(); 
 	private List<Node> visited = new ArrayList<Node>();
 	private List<Node> frontierBuffer = new ArrayList<Node>();
+	private Map<Node, Node> cameFrom;
 	
 	protected Pathfinder(RobotController rc) {
 		this.rc = rc;
@@ -29,16 +32,24 @@ public class Pathfinder {
 	}
 	
 	private void runPathfind() {
-		initPathfind();
-		buildFrontier();
-		iterateFrontier();
+		Node start = Node.currentNode();
+		
+		initPathfind(start);
+		initBuildFrontier();
+		iterateFrontier();		
 	}
 	
-	private void initPathfind() {
+	private void initPathfind(Node start) {
 		System.out.println("Running initPathfind()");
-		System.out.println("_____Clearing frontier...");
+		System.out.println("Initializing cameFrom");
+		cameFrom = new HashMap<Node, Node>();
+		cameFrom.put(start, Node.currentNode());
+		for(Node node: cameFrom.keySet()) {
+			System.out.println("{" + node.getX() + ", " + node.getY() + "} : {" + cameFrom.get(node).getX() + ", " + cameFrom.get(node).getY() + "}");
+		}
+		System.out.println("Clearing frontier...");
 		frontier.clear();
-		System.out.println("_____...frontier clear!");
+		System.out.println("...frontier clear!");
 		frontier.add(Node.currentNode());
 		System.out.println("Added currentNode to frontier: " + "{" + Node.currentNode().getX() + ", " + Node.currentNode().getY() + "}");
 		System.out.println("frontier contains:");
@@ -53,11 +64,16 @@ public class Pathfinder {
 		}
 	}
 	
-	private void buildFrontier() {
+	private void  initBuildFrontier() {
 		System.out.println("Running buildFrontier()");
 		for(Node node : Node.getSurroundingNodes()) {
-			System.out.println("_____Building a frontier node at: {" + node.getX() + ", " + node.getY() + "}");
+			System.out.println("Building a frontier node at: {" + node.getX() + ", " + node.getY() + "}");
 			frontier.add(node);
+			cameFrom.put(node, Node.currentNode());
+			System.out.println("cameFrom:");
+			for(Node cameFromNode: cameFrom.keySet()) {
+				System.out.println("{" + cameFromNode.getX() + ", " + cameFromNode.getY() + "} : {" + cameFrom.get(cameFromNode).getX() + ", " + cameFrom.get(cameFromNode).getY() + "}");
+			}
 			System.out.println("frontier contains:");
 			for(Node frontierNode : frontier) {
 				System.out.println("{" + frontierNode.getX() + ", " + frontierNode.getY() + "}");
@@ -79,6 +95,11 @@ public class Pathfinder {
 				System.out.println("Frontier does not contain this node!");
 				System.out.println("Adding {" + node.getX() + ", " + node.getY() + "} to the frontierBuffer");
 				frontierBuffer.add(node);
+				cameFrom.put(node, frontierNode);
+				System.out.println("cameFrom:");
+				for(Node cameFromNode: cameFrom.keySet()) {
+					System.out.println("{" + cameFromNode.getX() + ", " + cameFromNode.getY() + "} : {" + cameFrom.get(cameFromNode).getX() + ", " + cameFrom.get(cameFromNode).getY() + "}");
+				}
 				System.out.println("frontierBuffer contains:");
 				for(Node bufferNode : frontierBuffer) {
 					System.out.println("{" + bufferNode.getX() + ", " + bufferNode.getY() + "}");
@@ -120,10 +141,10 @@ public class Pathfinder {
 	private void iterateFrontier() {
 		System.out.println("Running iterateFrontier()");
 		for(Node node : frontier) {
-			System.out.println("_____Currently iterating node: {" + node.getX() + ", " + node.getY() + "}");
+			System.out.println("Currently iterating node: {" + node.getX() + ", " + node.getY() + "}");
 			if(!hasBeenVisited(node)) {
-				System.out.println("__________This node has not been visited.");
-				System.out.println("__________Running BuildFrontier(node)...");
+				System.out.println("This node has not been visited.");
+				System.out.println("Running BuildFrontier(node)...");
 				buildFrontier(node);
 				visited.add(node);
 				System.out.println("Added {" + node.getX() + ", " + node.getY() + "}");
