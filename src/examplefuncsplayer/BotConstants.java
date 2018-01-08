@@ -6,7 +6,6 @@ public interface BotConstants {
 	public final float CARDINAL = DEFAULT_EDGE_LENGTH;
 	public final float DIAG = (float) Math.sqrt(Math.pow(CARDINAL, 2) * 2);
 	public final double ON_NODE_PRECISION = 0.1;
-	public final NodeVector[] ALL_VECTORS = {NodeVector.N, NodeVector.NE, NodeVector.E, NodeVector.SE, NodeVector.S, NodeVector.SW, NodeVector.W, NodeVector.NW};
 	
 	/*
 	 * Direction constants

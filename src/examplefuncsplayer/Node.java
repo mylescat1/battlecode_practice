@@ -131,7 +131,7 @@ public class Node extends Global {
     		
 		Node[] surroundingNodes = new Node[8];
 		int i = 0;
-		for(NodeVector vector : BotConstants.ALL_VECTORS) {
+		for(NodeVector vector : NodeVector.getAllVectors()) {
 			surroundingNodes[i] = Node.add(node, BotConstants.DEFAULT_EDGE_LENGTH, vector);
 			i++;
 		}
@@ -143,7 +143,7 @@ public class Node extends Global {
 		Node currentNode = Node.currentNode();
 		Node[] surroundingNodes = new Node[8];
 		int i = 0;
-		for(NodeVector vector : BotConstants.ALL_VECTORS) {
+		for(NodeVector vector : NodeVector.getAllVectors()) {
 			surroundingNodes[i] = Node.add(currentNode, BotConstants.DEFAULT_EDGE_LENGTH, vector);
 			i++;
 		}

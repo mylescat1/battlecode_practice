@@ -53,6 +53,26 @@ public strictfp class NodeVector {
 	private static NodeVector getNW() {
 		return new NodeVector((float) ((3*Math.PI)/4), BotConstants.DIAG, 7);
 	}
+	
+	private static boolean isBetween(float x, float lower, float upper) {
+		return lower <= x && x < upper;
+	}	
+	
+	private static int calculateIndexClockwise(NodeVector nodeVector, int index) {
+		
+		if(nodeVector.getIndex() + index > 7) {
+			return (nodeVector.getIndex() + index) - 8;
+		}
+		return nodeVector.getIndex() + index;
+	}
+	
+	private static int calculateIndexCounterClockwise(NodeVector nodeVector, int index) {
+		
+		if(nodeVector.getIndex() - index < 0) {
+			return (nodeVector.getIndex() - index) + 8;
+		}
+		return nodeVector.getIndex() - index;	
+	}
 
 	public float getRadians() {
 		return this.direction;
@@ -64,6 +84,11 @@ public strictfp class NodeVector {
 	
 	public int getIndex() {
 		return this.index;
+	}
+	
+	public static NodeVector[] getAllVectors() {
+		NodeVector[] allVectors = {NodeVector.N, NodeVector.NE, NodeVector.E, NodeVector.SE, NodeVector.S, NodeVector.SW, NodeVector.W, NodeVector.NW};	
+		return allVectors;
 	}
 	
 	public static NodeVector getClosestVector(Direction direction) {
@@ -101,33 +126,14 @@ public strictfp class NodeVector {
 	
 	public static NodeVector adjustVectorClockwise(NodeVector currentVector, int steps) {
 		
-		int newIndex = calculateIndexClockwise(currentVector, steps%7);
-		return BotConstants.ALL_VECTORS[newIndex];
+		int newIndex = calculateIndexClockwise(currentVector, steps%8);
+		return getAllVectors()[newIndex];
 	}
 	
 	public static NodeVector adjustVectorCounterClockwise(NodeVector currentVector, int steps) {
 		
-		int newIndex = calculateIndexCounterClockwise(currentVector, steps%7);
-		return BotConstants.ALL_VECTORS[newIndex];
+		int newIndex = calculateIndexCounterClockwise(currentVector, steps%8);
+		return getAllVectors()[newIndex];
 	}
-	
-	private static boolean isBetween(float x, float lower, float upper) {
-		return lower <= x && x < upper;
-	}	
-	
-	private static int calculateIndexClockwise(NodeVector nodeVector, int index) {
-		
-		if(nodeVector.getIndex() + index > 7) {
-			return (nodeVector.getIndex() + index) - 8;
-		}
-		return nodeVector.getIndex() + index;
-	}
-	
-	private static int calculateIndexCounterClockwise(NodeVector nodeVector, int index) {
-		
-		if(nodeVector.getIndex() - index < 0) {
-			return (nodeVector.getIndex() - index) + 8;
-		}
-		return nodeVector.getIndex() - index;	
-	}
+
 }
