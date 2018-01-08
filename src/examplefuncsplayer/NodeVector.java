@@ -21,7 +21,7 @@ public strictfp class NodeVector {
 		this.edgeLength = edgeLength;
 		this.index = index;
 	}
-	
+
 	private static NodeVector getN() {
 		return new NodeVector((float) Math.PI/2, BotConstants.CARDINAL, 0);
 	}

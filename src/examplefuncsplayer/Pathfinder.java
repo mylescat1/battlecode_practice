@@ -13,28 +13,75 @@ public class Pathfinder {
 	private Node one;
 	private List<Node> frontier = new ArrayList<Node>(); 
 	private List<Node> visited = new ArrayList<Node>();
-	private float stride, senseRange, frontierCount;
-	private float pi = (float)Math.PI;
-	private float[]directions = {2*pi,(7*pi)/4,(3*pi)/2,(5*pi)/4, pi, 3*pi/4, pi/2, pi/4};
-	private int count;
+	private List<Node> frontierBuffer = new ArrayList<Node>();
 	
 	protected Pathfinder(RobotController rc) {
 		this.rc = rc;
-		this.stride = rc.getType().strideRadius;
-		this.senseRange = rc.getType().sensorRadius;
 	}
 	
-	protected void initPathfind() throws GameActionException {
-		
+	private boolean assertOnNode() throws GameActionException {
 		if(!Node.onNode()) {
 			System.out.println("Not on a node!");
 			Move.move(Node.getClosestNode());
+			return false;
+		}
+		return true;
+	}
+	
+	private void runPathfind() {
+		initPathfind();
+		buildFrontier();
+		iterateFrontier();
+	}
+	
+	private void initPathfind() {
+		frontier.clear();
+		frontier.add(Node.currentNode());
+		visited.add(Node.currentNode());
+	}
+	
+	private void buildFrontier() {
+		for(Node node : Node.getSurroundingNodes()) {
+			frontier.add(node);
+			rc.setIndicatorDot(node.getClosestMapLocation(), 100, 0, 0);
+		}
+	}
+	
+	private void buildFrontier(Node frontierNode) {
+		for(Node node : Node.getSurroundingNodes(frontierNode)) {
+			if(!frontier.contains(node)) {
+				frontierBuffer.add(node);
+				rc.setIndicatorDot(node.getClosestMapLocation(), 0, 0, 200);
+			}
+		}
+	}
+	
+	private void iterateFrontier() {
+		for(Node node : frontier) {
+			if(!visited.contains(node)) {
+				buildFrontier(node);
+				visited.add(node);
+			}
+		}
+		int count = frontier.size();
+		refreshBuffer();
+		if (frontier.size() > count) {
+			iterateFrontier();
+		}
+	}
+	
+	private void refreshBuffer() {
+		frontier.addAll(frontierBuffer);
+		frontierBuffer.clear();
+	}
+	
+	protected void pathfind() throws GameActionException {
+		
+		if(assertOnNode()) {			
+			runPathfind();
 		}
 		else {
-			for(Node node : Node.getSurroundingNodes() ) {
-				System.out.println(Clock.getBytecodesLeft());
-				System.out.println(node.getX() + ", " + node.getY());
-			}
+			Clock.yield();
 		}
 	}
 }
