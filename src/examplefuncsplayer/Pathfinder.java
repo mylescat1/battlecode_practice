@@ -1,12 +1,10 @@
 package examplefuncsplayer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-
 import battlecode.common.*;
 
 public class Pathfinder {
@@ -31,12 +29,47 @@ public class Pathfinder {
 		return true;
 	}
 	
-	private void runPathfind() {
+	private void runPathfind() throws GameActionException {
 		Node start = Node.currentNode();
+		Node goal = Node.getClosestNode(rc.getInitialArchonLocations(rc.getTeam().opponent())[0]);
 		
 		initPathfind(start);
 		initBuildFrontier();
-		iterateFrontier();		
+		iterateFrontier(goal);
+		ArrayList<Node> route = this.path(start, goal, this.cameFrom);
+		moveToGoal(route);
+		
+	}
+	
+	private void moveToGoal(ArrayList<Node> path) throws GameActionException {
+		Collections.reverse(path);
+		
+		for(Node node: path) {
+			Move.move(node);
+		}
+		
+	}
+	
+	private ArrayList<Node> path (Node start, Node goal, Map<Node, Node> cameFrom) {
+		System.out.println("I am at {" + Node.currentNode().getX() + ", " + Node.currentNode().getY() + "}");
+		Node pathNode = goal;
+		System.out.println("I am going to {" + goal.getX() + ", " + goal.getY() + "}");
+		ArrayList<Node> path = new ArrayList<Node>();
+		
+		while(pathNode != start) {
+			System.out.println("pathNode is {" + pathNode.getX() + ", " + pathNode.getY() + "}");
+			path.add(cameFrom.get(pathNode));
+			pathNode = cameFrom.get(pathNode);
+		}
+		
+		System.out.println("************");
+		System.out.println("Path array:");
+		
+		for(Node node : path) {
+			System.out.println("{" + node.getX() + ", " + node.getY() + "}");
+		}
+		
+		return path;
 	}
 	
 	private void initPathfind(Node start) {
@@ -138,8 +171,10 @@ public class Pathfinder {
 		return false;
 	}
 	
-	private void iterateFrontier() {
+	private void iterateFrontier(Node goal) {
 		System.out.println("Running iterateFrontier()");
+		Node breakNode = Node.currentNode();
+		outerloop:
 		for(Node node : frontier) {
 			System.out.println("Currently iterating node: {" + node.getX() + ", " + node.getY() + "}");
 			if(!hasBeenVisited(node)) {
@@ -152,18 +187,25 @@ public class Pathfinder {
 				for(Node visitedNode : visited) {
 					System.out.println("{" + visitedNode.getX() + ", " + visitedNode.getY() + "}");
 				}
-			} else {
+			}
+			
+			if(node.equals(goal)) {
+				System.out.println("*>*>*>*>*>*>*I found the goal node!");
+				breakNode = node;
+					break outerloop;
+				} else {
 				System.out.println("__________Visited contains this node!");
 			}
 		}
+		
 		int count = frontier.size();
 		System.out.println("iterateFrontier() for loop (ln 79) complete, count = " + count);
 		refreshBuffer();
 		System.out.println("Checking count vs. frontier.size...");
-		if (frontier.size() > count) {
+		if (frontier.size() > count || !breakNode.equals(goal)) {
 			System.out.println("-----Continue to iterate!-----");
-			iterateFrontier();
-		} else {
+			iterateFrontier(goal);
+			} else {
 			System.out.println("Frontier is complete!");
 		}
 	}

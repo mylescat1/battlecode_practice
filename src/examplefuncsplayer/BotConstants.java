@@ -2,7 +2,7 @@ package examplefuncsplayer;
 
 public interface BotConstants {
 	
-	public final int DEFAULT_EDGE_LENGTH = 2;
+	public final int DEFAULT_EDGE_LENGTH = 10;
 	public final float CARDINAL = DEFAULT_EDGE_LENGTH;
 	public final float DIAG = (float) Math.sqrt(Math.pow(CARDINAL, 2) * 2);
 	public final double ON_NODE_PRECISION = 0.1;
